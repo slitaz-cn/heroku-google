@@ -188,6 +188,15 @@ http {
 			proxy_buffering off;
                         sub_filter_types *;
                         sub_filter_once off;
+		}
+		location /ecoo/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass http://www.ecoo.top:8083;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
 
 		}
 	}
