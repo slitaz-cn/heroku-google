@@ -1,0 +1,183 @@
+daemon off;
+# Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+
+events {
+  use epoll;
+  accept_mutex on;
+  worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
+}
+
+http {
+
+  log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+  access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || 'logs/nginx/access.log' %> l2met;
+  error_log <%= ENV['NGINX_ERROR_LOG_PATH'] || 'logs/nginx/error.log' %>;
+
+  # Must read the body in 5 seconds.
+  client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
+
+  server {
+		listen <%= ENV["PORT"] %>;
+		keepalive_timeout 5;
+            
+                location = /compressiontest/gzip.html {
+                        return 403;
+                }
+
+		location / {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://www.google.com/;
+                        proxy_cookie_domain .google.com ggecoo.herokuapp.com;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'www.google.com' 'ggecoo.herokuapp.com';
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+			sub_filter 'zh.wikipedia.org' 'unipxy.herokuapp.com/proxy/https://zh.wikipedia.org';
+			sub_filter 'en.wikipedia.org' 'unipxy.herokuapp.com/proxy/https://en.wikipedia.org';
+			sub_filter 'encrypted-tbn0.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn0_gstatic_com';
+			sub_filter 'encrypted-tbn1.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn1_gstatic_com';
+			sub_filter 'encrypted-tbn2.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn2_gstatic_com';
+			sub_filter 'encrypted-tbn3.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn3_gstatic_com';
+			sub_filter 'webcache.googleusercontent.com' 'ggecoo.herokuapp.com/proxy_webcache_googleusercontent_com';
+		}
+
+                location /proxy_play_google_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://play.google.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+		}
+
+                location /proxy_www_gstatic_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://www.gstatic.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+			sub_filter 'encrypted-tbn0.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn0_gstatic_com';
+			sub_filter 'encrypted-tbn1.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn1_gstatic_com';
+			sub_filter 'encrypted-tbn2.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn2_gstatic_com';
+			sub_filter 'encrypted-tbn3.gstatic.com' 'ggecoo.herokuapp.com/proxy_encrypted-tbn3_gstatic_com';
+		}
+
+                location /proxy_webcache_googleusercontent_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://webcache.googleusercontent.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'webcache.googleusercontent.com' 'ggecoo.herokuapp.com/proxy_webcache_googleusercontent_com';
+		}
+
+                location /proxy_encrypted-tbn0_gstatic_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://encrypted-tbn0.gstatic.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+		}
+
+
+                location /proxy_encrypted-tbn1_gstatic_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://encrypted-tbn1.gstatic.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+		}
+
+
+                location /proxy_encrypted-tbn2_gstatic_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://encrypted-tbn2.gstatic.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+		}
+
+
+                location /proxy_encrypted-tbn3_gstatic_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://encrypted-tbn3.gstatic.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+		}
+
+                location /proxy_apis_google_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://apis.google.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+		}
+
+                location /proxy_ogs_google_com/ {
+                        if ($args ~* (.*)(ggecoo.herokuapp.com)(.*)) {
+                            set $args $1www.google.com$3;
+                            rewrite ^.*$ $1 redirect;
+                        }
+
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://ogs.google.com/;
+                        proxy_hide_header Set-Cookie;
+                        proxy_hide_header X-Frame-Options;
+                        add_header X-Frame-Options 'ALLOW-FROM https://ggecoo.herokuapp.com';
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+		}
+
+                location /proxy_id_google_com/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://id.google.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+			sub_filter 'apis.google.com' 'ggecoo.herokuapp.com/proxy_apis_google_com';
+			sub_filter 'ogs.google.com' 'ggecoo.herokuapp.com/proxy_ogs_google_com';
+			sub_filter 'id.google.com' 'ggecoo.herokuapp.com/proxy_id_google_com';
+			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
+			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
+		}
+	}
+}

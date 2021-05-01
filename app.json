@@ -1,0 +1,15 @@
+{
+	"name": "Reverse Proxy",
+	"description": "Spin up a reverse proxy quickly on Heroku",
+	"keywords": [
+		"reverse proxy",
+		"nginx"
+	],
+	"repository": "https://github.com/slitaz-cn/heroku-google",
+	"buildpacks": [
+		{
+			"url": "http://github.com/github7372/heroku-buildpack-nginx-with-http_sub_module.git"
+		}
+	],
+	"stack": "heroku-18"
+}
