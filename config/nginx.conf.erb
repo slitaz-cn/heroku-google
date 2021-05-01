@@ -179,5 +179,16 @@ http {
 			sub_filter 'www.gstatic.com' 'ggecoo.herokuapp.com/proxy_www_gstatic_com';
 			sub_filter 'play.google.com' 'ggecoo.herokuapp.com/proxy_play_google_com';
 		}
+		
+		location /gh/ {
+                        proxy_set_header Accept-Encoding "";
+			proxy_pass https://github.com/;
+                        proxy_hide_header Set-Cookie;
+			proxy_http_version 1.1;
+			proxy_buffering off;
+                        sub_filter_types *;
+                        sub_filter_once off;
+
+		}
 	}
 }
